@@ -24,6 +24,10 @@ api.interceptors.response.use(
       error?.response?.data || error?.message
     );
     if (status === 401) {
+      // Don't intercept logout requests — let them complete normally
+      if (error?.config?.url?.includes('/auth/logout')) {
+        return Promise.reject(error);
+      }
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       window.location.href = "/login";

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { logoutApi } from "../api/auth";
 
 export const useAuthStore = create((set) => ({
   user: null,
@@ -15,7 +16,12 @@ export const useAuthStore = create((set) => ({
       isAuthenticated: true,
     });
   },
-  logout: () => {
+  logout: async () => {
+    try {
+      await logoutApi();
+    } catch {
+      // Backend call best-effort — always clean up locally
+    }
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false });

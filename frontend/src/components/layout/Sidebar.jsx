@@ -49,8 +49,12 @@ export default function Sidebar() {
       </nav>
       <button
         className="mt-8 text-sm text-[var(--error)]"
-        onClick={() => {
-          logout();
+        onClick={async () => {
+          try {
+            await logout();
+          } catch {
+            // Best-effort: local cleanup happens inside logout()
+          }
           navigate("/login", { replace: true });
         }}
       >
