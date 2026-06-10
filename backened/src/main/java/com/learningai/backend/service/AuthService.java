@@ -29,13 +29,15 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        String email = normalizeEmail(request.getEmail());
+
+        if (userRepository.existsByEmail(email)) {
             throw AppException.conflict("Email already registered");
         }
 
         User user = User.builder()
                 .fullName(request.getFullName())
-                .email(request.getEmail().toLowerCase())
+                .email(email)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(User.Role.USER)
                 .build();
@@ -51,6 +53,11 @@ public class AuthService {
 
         log.info("New user registered: {}", user.getEmail());
         return buildAuthResponse(user, accessToken, refreshToken);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isEmailAvailable(String email) {
+        return !userRepository.existsByEmail(normalizeEmail(email));
     }
 
     @Transactional
@@ -125,6 +132,10 @@ public class AuthService {
             log.error("Failed to hash token: {}", e.getMessage());
             throw new RuntimeException("Token hashing failed");
         }
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
     }
 
     private AuthResponse buildAuthResponse(User user,

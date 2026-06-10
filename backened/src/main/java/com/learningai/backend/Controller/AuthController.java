@@ -6,6 +6,7 @@ import com.learningai.backend.dto.request.RegisterRequest;
 import com.learningai.backend.dto.response.ApiResponse;
 import com.learningai.backend.dto.response.AuthResponse;
 import com.learningai.backend.entity.User;
+import com.learningai.backend.exception.AppException;
 import com.learningai.backend.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.util.StringUtils;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -32,6 +34,18 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.ok("User registered successfully", response));
+    }
+
+    @GetMapping("/email-available")
+    @Operation(summary = "Check whether an email can be used for registration")
+    public ResponseEntity<ApiResponse<Boolean>> emailAvailable(@RequestParam String email) {
+        if (!StringUtils.hasText(email)) {
+            throw AppException.badRequest("Email is required");
+        }
+
+        boolean available = authService.isEmailAvailable(email);
+        String message = available ? "Email is available" : "Email already registered";
+        return ResponseEntity.ok(ApiResponse.ok(message, available));
     }
 
     @PostMapping("/login")

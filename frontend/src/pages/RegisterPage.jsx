@@ -6,6 +6,7 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import AuthShell from "../components/layout/AuthShell";
 import { generateOtpFromEmailAndTime } from "../utils/otp";
+import { checkEmailAvailabilityApi } from "../api/auth";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -54,11 +55,20 @@ export default function RegisterPage() {
       return;
     }
 
+    const email = form.email.trim().toLowerCase();
+    const fullName = form.fullName.trim();
+
     setLoading(true);
     setError("");
     try {
+      const isEmailAvailable = await checkEmailAvailabilityApi(email);
+      if (!isEmailAvailable) {
+        setError("Email already registered. Please sign in instead.");
+        return;
+      }
+
       const generatedAtTime = new Date().toTimeString().slice(0, 8);
-      const otp = generateOtpFromEmailAndTime(form.email, generatedAtTime);
+      const otp = generateOtpFromEmailAndTime(email, generatedAtTime);
 
       const { serviceId, templateId, publicKey, missing } = getEmailJsConfig();
 
@@ -73,9 +83,9 @@ export default function RegisterPage() {
           // EmailJS OTP template expects these exact keys.
           passcode: otp,
           time: "10 minutes",
-          email: form.email,
-          to_email: form.email,
-          user_name: form.fullName,
+          email,
+          to_email: email,
+          user_name: fullName,
           otp_code: otp,
           app_name: "Personalized Learning",
         },
@@ -84,8 +94,8 @@ export default function RegisterPage() {
 
       navigate("/register/verify-otp", {
         state: {
-          fullName: form.fullName,
-          email: form.email,
+          fullName,
+          email,
           password: form.password,
           generatedAtTime,
         },
