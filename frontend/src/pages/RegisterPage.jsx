@@ -57,6 +57,22 @@ export default function RegisterPage() {
     setLoading(true);
     setError("");
     try {
+      // Check if email is already registered BEFORE sending OTP
+      try {
+        const checkRes = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/auth/check-email?email=${encodeURIComponent(form.email)}`);
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          if (checkData?.data?.exists) {
+            setError("This email is already registered. Please sign in instead.");
+            setLoading(false);
+            return;
+          }
+        }
+      } catch {
+        // If check-email endpoint doesn't exist, continue with OTP flow
+        // The backend will still catch duplicates on final registration
+      }
+
       const generatedAtTime = new Date().toTimeString().slice(0, 8);
       const otp = generateOtpFromEmailAndTime(form.email, generatedAtTime);
 

@@ -112,6 +112,15 @@ public class AuthService {
         });
     }
 
+    /**
+     * Check if an email is already registered.
+     * Used by the frontend to validate email BEFORE sending OTP,
+     * so users don't waste time verifying an email that will be rejected.
+     */
+    public boolean emailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
     // ─── Hash a token with SHA-256 ────────────────────────────────────────
     // Returns lowercase hex string — safe to store in DB
 
