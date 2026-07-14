@@ -59,4 +59,13 @@ public class AuthController {
         }
         return ResponseEntity.ok(ApiResponse.ok("Logged out successfully", null));
     }
+
+    @GetMapping("/check-email")
+    @Operation(summary = "Check if an email is already registered")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> checkEmail(
+            @RequestParam String email) {
+        boolean exists = authService.emailExists(email.toLowerCase());
+        return ResponseEntity.ok(ApiResponse.ok("Email check completed",
+                java.util.Map.of("exists", exists)));
+    }
 }
