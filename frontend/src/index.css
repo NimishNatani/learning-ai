@@ -21,6 +21,25 @@
   --hard: #ef4444;
 }
 
+.dark {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface-2: #262626;
+  --border: #333333;
+  --text: #e5e5e5;
+  --text-muted: #777777;
+  --accent: #818cf8;
+  --accent-hover: #6366f1;
+  --accent-light: #818cf815;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --error: #f87171;
+  --error-hover: #ef4444;
+  --easy: #4ade80;
+  --medium: #fbbf24;
+  --hard: #f87171;
+}
+
 body {
   margin: 0;
   font-family: "Inter", sans-serif;
